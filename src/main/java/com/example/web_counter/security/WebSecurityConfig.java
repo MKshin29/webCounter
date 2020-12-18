@@ -37,8 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests().anyRequest().authenticated()
-//                .antMatchers("/api/savevisit").hasAuthority("ACCESS_SAVEVISIT")
-//                .antMatchers("/api/stats").hasAuthority("ACCESS_STATS")
+                .antMatchers("/api/savevisit").hasAuthority("ACCESS_SAVEVISIT")
+                .antMatchers("/api/stats").hasAuthority("ACCESS_STATS")
                 .and()
                 .httpBasic();
     }
