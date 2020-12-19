@@ -30,10 +30,8 @@ public class CounterRestController {
     private final CounterService counterService;
     private final SiteRepository siteRepository;
 
-
     @Autowired
-    public CounterRestController(CounterService counterService,
-                                 SiteRepository siteRepository) {
+    public CounterRestController(CounterService counterService, SiteRepository siteRepository) {
         this.counterService = counterService;
         this.siteRepository = siteRepository;
     }
