@@ -1,9 +1,11 @@
 package com.example.web_counter.rest;
 
+import com.example.web_counter.model.RequestVisit;
 import com.example.web_counter.model.Site;
 import com.example.web_counter.model.User;
 import com.example.web_counter.model.Visit;
 import com.example.web_counter.repository.SiteRepository;
+import com.example.web_counter.repository.UserRepository;
 import com.example.web_counter.repository.VisitRepository;
 import com.example.web_counter.service.CounterService;
 import com.example.web_counter.service.CounterServiceImpl;
@@ -26,42 +28,45 @@ import java.util.regex.Pattern;
 @RequestMapping("api")
 public class CounterRestController {
 
+    private final CounterService counterService;
+    private final SiteRepository siteRepository;
+
+
     @Autowired
-    CounterService counterService;
-    @Autowired
-    private SiteRepository siteRepository;
-    @Autowired
-    private VisitRepository visitRepository;
+    public CounterRestController(CounterService counterService,
+                                 SiteRepository siteRepository) {
+        this.counterService = counterService;
+        this.siteRepository = siteRepository;
+    }
 
     @GetMapping("test")
     public String test() {return "Test1";}
 
     @PostMapping("savevisit")
-    public ResponseEntity<Map> saveVisit( @RequestBody(required = true) String username,
-                                            @RequestBody(required = true) String url){
+    public ResponseEntity<Map> saveVisit(@RequestBody RequestVisit requestVisit){
 
-        User user = this.counterService.getUserByUsername(username);
+        User user = this.counterService.getUserByUsername(requestVisit.getUsername());
         Map<String, String> result = new HashMap<>();
 
         if (user == null){
             result.put("result", "Error. User not specified");
-            return new ResponseEntity<Map>(result,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(result,HttpStatus.BAD_REQUEST);
         }
 
-        Site site = this.counterService.getSiteByUrl(url);
+        Site site = this.counterService.getSiteByUrl(requestVisit.getUrl());
         if (site == null){
             Site tempSite = new Site();
-            tempSite.setUrl(url);
+            tempSite.setUrl(requestVisit.getUrl());
 
             siteRepository.save(tempSite);
 
-            site = this.counterService.getSiteByUrl(url);
+            site = this.counterService.getSiteByUrl(requestVisit.getUrl());
         }
 
         this.counterService.saveVisit(user.getId(), site.getId());
 
         result.put("result", "Success. Added new record");
-        return new ResponseEntity<Map>(result,HttpStatus.OK);
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     //@RequestMapping(name = "stats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,7 +87,7 @@ public class CounterRestController {
             }
             else {
                 result.put("error", 1);
-                return new ResponseEntity<Map>(result, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -90,11 +95,11 @@ public class CounterRestController {
 
         if (!Pattern.matches(time_stamp_regex, dateTo)){
             if (Pattern.matches(time_stamp_regex_short, dateTo)){
-                dateFrom = dateFrom + "000000";
+                dateTo = dateTo + "000000";
             }
             else {
                 result.put("error", 1);
-                return new ResponseEntity<Map>(result, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -107,7 +112,7 @@ public class CounterRestController {
             result = this.counterService.getStatistics(d_date_from, d_date_to, 1);
         }
 
-        return new ResponseEntity<Map>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }

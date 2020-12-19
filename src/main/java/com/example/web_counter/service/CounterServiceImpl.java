@@ -18,12 +18,16 @@ import java.util.Map;
 @Service
 public class CounterServiceImpl implements CounterService {
 
+    private final SiteRepository siteRepository;
+    private final UserRepository userRepository;
+    private final VisitRepository visitRepository;
+
     @Autowired
-    SiteRepository siteRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    VisitRepository visitRepository;
+    public CounterServiceImpl(SiteRepository siteRepository, UserRepository userRepository, VisitRepository visitRepository) {
+        this.siteRepository = siteRepository;
+        this.userRepository = userRepository;
+        this.visitRepository = visitRepository;
+    }
 
     @Override
     public Site getSiteByUrl(String url) {
@@ -41,6 +45,7 @@ public class CounterServiceImpl implements CounterService {
         Visit visit = new Visit();
         visit.setUser_id(user_id);
         visit.setSite_id(site_id);
+        visit.setDate(new Date(System.currentTimeMillis()));
 
         visitRepository.save(visit);
     }
