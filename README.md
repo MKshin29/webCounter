@@ -57,6 +57,5 @@ Get-параметры запроса:
     "result": "Success. Added new record"
 }
 
-##Сборка
 Сборка производится в плагине maven для IntellIJIdea. 
 
