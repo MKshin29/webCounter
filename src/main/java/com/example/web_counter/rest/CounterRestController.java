@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping("api")
 public class CounterRestController {
 
     private final CounterService counterService;

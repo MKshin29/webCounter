@@ -2,7 +2,7 @@ package com.example.web_counter.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
 
-@Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -23,9 +22,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
-                .withUser("user").password(passwordEncoder().encode("111")).roles("USER").authorities("ACCESS_SAVEVISIT")
+                .withUser("user").password(passwordEncoder().encode("111")).roles("User").authorities("Savevisit")
                 .and()
-                .withUser("admin").password(passwordEncoder().encode("222")).roles("ADMIN").authorities("ACCESS_SAVEVISIT", "ACCESS_STATS");
+                .withUser("admin").password(passwordEncoder().encode("222")).roles("User", "Admin").authorities("Savevisit", "Stats");
+
 
 //            .jdbcAuthentication().dataSource(dataSource)
 //            .usersByUsernameQuery("select username, password from users where username=?")
@@ -36,9 +36,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .authorizeRequests().anyRequest().permitAll();
-    }
+                .authorizeRequests()
+                .antMatchers("/test").permitAll()
+                .antMatchers("/stats").hasAuthority("Stats")
+                .anyRequest().authenticated()
+            .and()
+                .httpBasic()
+            .and()
+                .csrf().disable();
+}
 
     @Bean
     PasswordEncoder passwordEncoder(){
